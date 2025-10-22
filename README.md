@@ -11,7 +11,11 @@ This implementation draws the snake as a line, which not only makes it easy to s
 
 An input buffer is used to keep track of the user's inputs. This makes the game more responsive and makes sure no input is lost.
 
+![Input buffer demonstration](/images/input_buffer.gif)
+
 When you are about to game over, the game gives you a grace period to allow you to quickly turn away and save your run.
+
+![Input buffer demonstration](/images/grace_period.gif)
 
 ### Customisation
 You can change:
@@ -19,6 +23,8 @@ You can change:
 + Tick interval
 + Graphics mode
 + Game scale
+
+![Input buffer demonstration](/images/options_pane.png)
 
 You can make your graphics mode by simply making a C# script and implementing the `SnakeRenderer` interface.
 
