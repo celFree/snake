@@ -1,6 +1,8 @@
 # snake
 A version of the classic Snake game written in C# and WinForms. 
 
+![Example gameplay](/images/gameplay_static.png)
+
 ## Features
 ### Comfortable gameplay
 Many basic Snake implementations will draw the snake as multiple shapes, which not only makes it hard to see which direction the snake is facing, where the snake's head is, etc, but it just looks plain ugly and like a blob on the screen.
