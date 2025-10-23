@@ -3,7 +3,7 @@ A version of the classic Snake game written in C# and WinForms.
 
 ![Example gameplay](/images/gameplay_static.png)
 
-**This guide is for users who wish to learn more about the technical implementation details about this version of Snake. If you simply want to run the game, see [Getting started](README.md#getting-started).**
+**This guide is for users who wish to learn more about the technical implementation details and my programming philosophy behind this version of Snake. If you simply want to run the game, see [Getting started](README.md#getting-started).**
 
 ## Project structure
 The project tree looks like this:
@@ -49,7 +49,7 @@ All logic uses the custom type `SnakePoint`, defined like so:
 `SnakePoint` represents a "logic" point where any sort of measurements are ignored, they are just raw coordinates. 
 Think of it like a cartesian plane - it does not concern itself with the physical distance between points, or the size of a grid on a plane, it simply represents a point, line, function or graph. It is up to drawer of the plane how big the grids should be. Similarly, logic does not concern itself how the snake is drawn. For all `Snake.Logic` cares, the renderer can completely ignore the specified coordinates. 
 
-### `Direction`
+#### `Direction`
 This is a enum defined in the class `LogicHandler`, like so:
 
 ```
@@ -63,5 +63,47 @@ public enum Direction      // line 27
 
 If one of my goals for this project was not portability, then I could've bound the values of `Direction` to the values of `System.Windows.Forms.Keys`, as it would be slightly faster to process the input from `e.KeyCode` from `Form1.OnKeyDown` and convert it to `Direction`. However, because `LogicHandler` cannot guarantee that the logic will be used on a Windows machine, we convert anyway to maintain portability. On modern machines, the extra delay is negligible anyway.
 
-### `LogicHandler`
+#### `LogicHandler`
 This is a pretty important class, which is why I decided to split the LogicHandler.cs section into multiple sub-sections.
+
+`LogicHandler` is defined like so:
+```
+internal class LogicHandler
+{
+    // ...
+}
+```
+
+##### Members and events
+```
+List<SnakePoint> snakeBody = [new SnakePoint(5, 8), new SnakePoint(4, 8)];
+
+SnakePoint apple = new SnakePoint(11, 8);
+
+private int score = 0;
+
+public enum Direction
+{
+    Up, Down, Left, Right
+}
+
+Dictionary<Direction, SnakePoint> directions = new Dictionary<Direction, SnakePoint>()
+{
+    { Direction.Up, new SnakePoint(0, -1) },
+    { Direction.Down, new SnakePoint(0, 1) },
+    { Direction.Left, new SnakePoint(-1, 0) },
+    { Direction.Right, new SnakePoint(1, 0) }
+};
+
+Direction current = Direction.Right;
+bool paused = false;
+
+InputHandler input;
+
+Random r = new Random();
+
+public event EventHandler? RequestRedraw;
+```
+
+
+
