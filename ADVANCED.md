@@ -80,7 +80,7 @@ List<SnakePoint> snakeBody = [new SnakePoint(5, 8), new SnakePoint(4, 8)];
 
 SnakePoint apple = new SnakePoint(11, 8);
 
-private int score = 0;
+int score = 0;
 
 Dictionary<Direction, SnakePoint> directions = new Dictionary<Direction, SnakePoint>()
 {
@@ -102,27 +102,23 @@ public event EventHandler? RequestRedraw;
 + `snakeBody` is a list of `SnakePoint`s that make up the snake's body. This should be self explanatory, but oh well. Each point is 1pt apart, none *should* overlap or cross over.
 + `apple` is represents the apple's location. There is no reason to call `apple` an apple, other than the fact that I've played way too much Google Snake and just adopted the fruit they used. Either way, it's the object the player aims to obtain to increase their score.
 + `score` represents the player's score.
++ `directions` are the increments needed to move a certain direction. This is to remove the need for a "magic constant".
 + `current` represents which `Direction` the snake's head is facing.
 + `input` is an instance of `InputHandler`. The specifics of `InputHandler` will be explained later, just know that `LogicHandler` grabs inputs already translated to `Direction`s and moves accordingly.
 + `r` is an instance of `Random`. It is used to randomly generate the coordinates of the object.
 + `RequestRedraw` is an nullable event that is raised when the logic handler wants a renderer to redraw. Why not use `Control.Invalidate()` then? The problem is that then makes the logic dependent on `System.Windows.Forms` which we can't guarantee that the renderer or the UI uses. Additionally, it forces the relevant renderers to redraw, when we shouldn't concern ourselves on renderer details. We shouldn't care if the renderer redraws or not; that is up to the renderer to decide. So we allow anyone to subscribe to `RequestRedraw` and do what they want when they receive the event. The event is nullable as we can't guarantee anyone is subscribed to that event, which will throw a `NullReferenceException`.
 
+Note that all these members are `private`. Consult the documentation (WIP) to see the exposed getters and setters. 
+
 #### Methods and constructor(s)
-| Name | Access modifier | Arguments | Return type | Summary |
-|---|---|---|---|---|
-`LogicHandler` | `public`   | none | none   | Initialises a new instance of `LogicHandler`. This also creates initialises its own input buffer.
-`UpdateDirection` | `internal` | none | `void` | Sets the current direction (`current`) to the first element in the input buffer.
-`CheckCollision` | `internal` | none | `bool` | Checks for collision with the snake's head and the outer boundaries, apple or itself.
-`IsCollisionNextTick` | `internal` | none | `bool` | Creates a copy of the snake body, moves the temporary snake based on the current direction and checking for a collision. This method is used for the grace period feature.
-`MoveSnake` | `internal` | none | `void` | Moves the snake based on the current direction. 
-`PlaceApple` | `private` | none | `void` | Randomly place the apple on the anywhere on the field except where the snake's body is.
-`ResetGame` | `internal` | none | `void` | Resets the game - sets the snake to its starting length and position, sets the apple in its default starting position and resets the score to 0.
+Because this isn't meant to be a reference per se, I only list the methods that are relevant to explaining the code design.
 
-#### Getters and setters
-| Name | Type | Access modifier | Read only? | Summary |
-|---|---|---|---|---|
-`Apple` | `SnakePoint` | `public` | Yes | Get the apple's position.
-`CurrentDirection` | `Direction` | `public` | Yes | Gets the direction the snake's head is facing.
-`InputHandler` | `InputHandler` | `public` | Yes | Gets this `LogicHandler`'s input handler.
-`Score` | `int` | `public` | Yes | Gets the player's score.
+The constructor creates its own `InputHandler` to get input from. 
 
+`internal void UpdateDirection()` (line 56) gets the first input from the input buffer. The input buffer is a list of `Direction`s and not `System.Windows.Forms.Keys`, and why that is is explained in the implementation details of `Direction`.
+
+`internal bool CheckCollision()`(line 64) checks the snake's head collision with the apple, outer boundaries, or itself. It's used by the UI to determine when to end the game.
+
+`internal void MoveSnake()` (line 118) moves the snake based on `current`. It starts with the last `SnakePoint` in `snakeBody` (the tail of the snake) and it takes on the value of the next `SnakePoint`, and the next `SnakePoint` takes on the value of the next `SnakePoint` and so on until we get to the head. The head's position is incremented based on the increments specified in `directions`. It is mainly used in the autonomous movement when the user doesn't press any key to continue moving in the same direction. Because the default UI calls `MoveSnake()` on a timer, all the logic needs to do to register the keystroke is obtain the last keystroke from `input` and change it, and wait for the next call of `MoveSnake()`.
+
+`internal bool IsCollisionNextTick()` (line 91) is a combination between `CheckCollision()` and `MoveSnake()`; it creates a copy of `snakeBody`, moves it using code similar to that of `MoveSnake()` and use that copy to test for collision. This is used by the grace period feature to determine if we need to pause.
