@@ -119,5 +119,10 @@ public event EventHandler? RequestRedraw;
 `ResetGame` | `internal` | none | `void` | Resets the game - sets the snake to its starting length and position, sets the apple in its default starting position and resets the score to 0.
 
 #### Getters and setters
-| Name | Access modifier | Read only? | Summary |
-|---|---|---|---|
+| Name | Type | Access modifier | Read only? | Summary |
+|---|---|---|---|---|
+`Apple` | `SnakePoint` | `public` | Yes | Get the apple's position.
+`CurrentDirection` | `Direction` | `public` | Yes | Gets the direction the snake's head is facing.
+`InputHandler` | `InputHandler` | `public` | Yes | Gets this `LogicHandler`'s input handler.
+`Score` | `int` | `public` | Yes | Gets the player's score.
+
