@@ -82,11 +82,6 @@ SnakePoint apple = new SnakePoint(11, 8);
 
 private int score = 0;
 
-public enum Direction
-{
-    Up, Down, Left, Right
-}
-
 Dictionary<Direction, SnakePoint> directions = new Dictionary<Direction, SnakePoint>()
 {
     { Direction.Up, new SnakePoint(0, -1) },
@@ -96,7 +91,6 @@ Dictionary<Direction, SnakePoint> directions = new Dictionary<Direction, SnakePo
 };
 
 Direction current = Direction.Right;
-bool paused = false;
 
 InputHandler input;
 
@@ -105,5 +99,16 @@ Random r = new Random();
 public event EventHandler? RequestRedraw;
 ```
 
++ `snakeBody` is a list of `SnakePoint`s that make up the snake's body. This should be self explanatory, but oh well. Each point is 1pt apart, none *should* overlap or cross over.
++ `apple` is represents the apple's location. There is no reason to call `apple` an apple, other than the fact that I've played way too much Google Snake and just adopted the fruit they used. Either way, it's the object the player aims to obtain to increase their score.
++ `score` represents the player's score.
++ `current` represents which `Direction` the snake's head is facing.
++ `input` is an instance of `InputHandler`. The specifics of `InputHandler` will be explained later, just know that `LogicHandler` grabs inputs already translated to `Direction`s and moves accordingly.
++ `r` is an instance of `Random`. It is used to randomly generate the coordinates of the object.
++ `RequestRedraw` is an nullable event that is raised when the logic handler wants a renderer to redraw. Why not use `Control.Invalidate()` then? The problem is that then makes the logic dependent on `System.Windows.Forms` which we can't guarantee that the renderer or the UI uses. Additionally, it forces the relevant renderers to redraw, when we shouldn't concern ourselves on renderer details. We shouldn't care if the renderer redraws or not; that is up to the renderer to decide. So we allow anyone to subscribe to `RequestRedraw` and do what they want when they receive the event. The event is nullable as we can't guarantee anyone is subscribed to that event, which will throw a `NullReferenceException`.
 
+#### Methods
+| Name | Access modifier | Arguments | Return type | Summary |
+|---|---|---|---|---|
+internal void UpdateDirection()
 
