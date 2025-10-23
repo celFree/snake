@@ -5,6 +5,8 @@ A version of the classic Snake game written in C# and WinForms.
 
 **This guide is for users who wish to learn more about the technical implementation details and my programming philosophy behind this version of Snake. If you simply want to run the game, see [Getting started](README.md#getting-started).**
 
+**It is also NOT documentation for specific functions. I only show my design philosophy behind this code and some basic overviews on how the project is structured and how to get started modifying the game.**
+
 ## Project structure
 The project tree looks like this:
 
@@ -99,12 +101,10 @@ public event EventHandler? RequestRedraw;
 
 + `snakeBody` is a list of `SnakePoint`s that make up the snake's body. This should be self explanatory, but oh well. Each point is 1pt apart, none *should* overlap or cross over.
 + `apple` is represents the apple's location. There is no reason to call `apple` an apple, other than the fact that I've played way too much Google Snake and just adopted the fruit they used. Either way, it's the object the player aims to obtain to increase their score.
-+ `score` represents the player's score.
-+ `directions` are the increments needed to move a certain direction. This is to remove the need for a "magic constant".
++ `directions` are the increments needed to move a certain direction. This is to remove the need for a "magic constant", so instead of manually checking what direction the snake is facing each time we move the snake, we access the increment values attached to the corresponding key.
 + `current` represents which `Direction` the snake's head is facing.
 + `input` is an instance of `InputHandler`. The specifics of `InputHandler` will be explained later, just know that `LogicHandler` grabs inputs already translated to `Direction`s and moves accordingly.
-+ `r` is an instance of `Random`. It is used to randomly generate the coordinates of the object.
-+ `RequestRedraw` is an nullable event that is raised when the logic handler wants a renderer to redraw. Why not use `Control.Invalidate()` then? The problem is that then makes the logic dependent on `System.Windows.Forms` which we can't guarantee that the renderer or the UI uses. Additionally, it forces the relevant renderers to redraw, when we shouldn't concern ourselves on renderer details. We shouldn't care if the renderer redraws or not; that is up to the renderer to decide. So we allow anyone to subscribe to `RequestRedraw` and do what they want when they receive the event. The event is nullable as we can't guarantee anyone is subscribed to that event, which will throw a `NullReferenceException`.
++ `RequestRedraw` is an nullable event that is raised when the logic handler wants a renderer to redraw. Why not use `Control.Invalidate()` then? The problem is that then makes the logic dependent on `System.Windows.Forms` which we can't guarantee that the renderer or the UI uses. Additionally, it forces the relevant renderers to redraw, when we shouldn't concern ourselves on what the renderer does. We shouldn't care if the renderer redraws or not; that is up to the renderer to decide. So we allow anyone to subscribe to `RequestRedraw` and do what they want when they receive the event. The event is nullable as we can't guarantee anyone is subscribed to that event, and if we raise the event with no subscribers, it will throw a `NullReferenceException`.
 
 Note that all these members are `private`. Consult the documentation (WIP) to see the exposed getters and setters. 
 
