@@ -107,8 +107,17 @@ public event EventHandler? RequestRedraw;
 + `r` is an instance of `Random`. It is used to randomly generate the coordinates of the object.
 + `RequestRedraw` is an nullable event that is raised when the logic handler wants a renderer to redraw. Why not use `Control.Invalidate()` then? The problem is that then makes the logic dependent on `System.Windows.Forms` which we can't guarantee that the renderer or the UI uses. Additionally, it forces the relevant renderers to redraw, when we shouldn't concern ourselves on renderer details. We shouldn't care if the renderer redraws or not; that is up to the renderer to decide. So we allow anyone to subscribe to `RequestRedraw` and do what they want when they receive the event. The event is nullable as we can't guarantee anyone is subscribed to that event, which will throw a `NullReferenceException`.
 
-#### Methods
+#### Methods and constructor(s)
 | Name | Access modifier | Arguments | Return type | Summary |
 |---|---|---|---|---|
-internal void UpdateDirection()
+`LogicHandler` | `public`   | none | none   | Initialises a new instance of `LogicHandler`. This also creates initialises its own input buffer.
+`UpdateDirection` | `internal` | none | `void` | Sets the current direction (`current`) to the first element in the input buffer.
+`CheckCollision` | `internal` | none | `bool` | Checks for collision with the snake's head and the outer boundaries, apple or itself.
+`IsCollisionNextTick` | `internal` | none | `bool` | Creates a copy of the snake body, moves the temporary snake based on the current direction and checking for a collision. This method is used for the grace period feature.
+`MoveSnake` | `internal` | none | `void` | Moves the snake based on the current direction. 
+`PlaceApple` | `private` | none | `void` | Randomly place the apple on the anywhere on the field except where the snake's body is.
+`ResetGame` | `internal` | none | `void` | Resets the game - sets the snake to its starting length and position, sets the apple in its default starting position and resets the score to 0.
 
+#### Getters and setters
+| Name | Access modifier | Read only? | Summary |
+|---|---|---|---|
