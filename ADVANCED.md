@@ -64,8 +64,6 @@ public enum Direction      // line 27
 If one of my goals for this project was not portability, then I could've bound the values of `Direction` to the values of `System.Windows.Forms.Keys`, as it would be slightly faster to process the input from `e.KeyCode` from `Form1.OnKeyDown` and convert it to `Direction`. However, because `LogicHandler` cannot guarantee that the logic will be used on a Windows machine, we convert anyway to maintain portability. On modern machines, the extra delay is negligible anyway.
 
 #### `LogicHandler`
-This is a pretty important class, which is why I decided to split the LogicHandler.cs section into multiple sub-sections.
-
 `LogicHandler` is defined like so:
 ```
 internal class LogicHandler
@@ -110,15 +108,40 @@ public event EventHandler? RequestRedraw;
 
 Note that all these members are `private`. Consult the documentation (WIP) to see the exposed getters and setters. 
 
-#### Methods and constructor(s)
+##### Methods and constructor(s)
 Because this isn't meant to be a reference per se, I only list the methods that are relevant to explaining the code design.
 
 The constructor creates its own `InputHandler` to get input from. 
 
 `internal void UpdateDirection()` (line 56) gets the first input from the input buffer. The input buffer is a list of `Direction`s and not `System.Windows.Forms.Keys`, and why that is is explained in the implementation details of `Direction`.
 
-`internal bool CheckCollision()`(line 64) checks the snake's head collision with the apple, outer boundaries, or itself. It's used by the UI to determine when to end the game.
+`internal bool CheckCollision()` (line 64) checks the snake's head collision with the apple, outer boundaries, or itself. It's used by the UI to determine when to end the game.
 
 `internal void MoveSnake()` (line 118) moves the snake based on `current`. It starts with the last `SnakePoint` in `snakeBody` (the tail of the snake) and it takes on the value of the next `SnakePoint`, and the next `SnakePoint` takes on the value of the next `SnakePoint` and so on until we get to the head. The head's position is incremented based on the increments specified in `directions`. It is mainly used in the autonomous movement when the user doesn't press any key to continue moving in the same direction. Because the default UI calls `MoveSnake()` on a timer, all the logic needs to do to register the keystroke is obtain the last keystroke from `input` and change it, and wait for the next call of `MoveSnake()`.
 
-`internal bool IsCollisionNextTick()` (line 91) is a combination between `CheckCollision()` and `MoveSnake()`; it creates a copy of `snakeBody`, moves it using code similar to that of `MoveSnake()` and use that copy to test for collision. This is used by the grace period feature to determine if we need to pause.
+`internal bool IsCollisionNextTick()` (line 91) is a combination between `CheckCollision()` and `MoveSnake()`; it creates a copy of `snakeBody`, moves it using code similar to that of `MoveSnake()` and use that copy to test for collision. This is used by the grace period feature to determine if we need to pause for an extra tick.
+
+### `InputHandler.cs`
+This file defines the class `InputHandler` which translates input passed from a `System.Windows.Form`.
+
+#### `InputHandler`
+`InputHandler` is defined like so:
+```
+internal class InputHandler
+{
+    // ...
+}
+```
+
+##### Members and events
+`InputHandler` only has one member:
+```
+// Only handle game controls, nothing else
+private List<LogicHandler.Direction> inputBuffer;
+```
+`inputBuffer` is the input buffer. Notice the comment - `InputHandler` is not designed to handle any input other than any keystrokes relevant to the game logic (like W, A, S and D).
+
+##### Methods and constructor(s)
+The constructor initialises `inputBuffer` with one element, `Direction.Right`.
+
+`internal void ProcessInput()` (line 17) 
